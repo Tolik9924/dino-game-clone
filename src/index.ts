@@ -23,3 +23,5 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 new Phaser.Game(config);
+
+// 23 videos is watched
