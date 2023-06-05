@@ -4,7 +4,8 @@ import PreloadScene from "./scenes/PreloadScene";
 import PlayScene from "./scenes/PlayScene";
 
 export const PRELOAD_CONFIG = {
-    cactusesCount: 6
+    cactusesCount: 6,
+    birdsCount: 1
 }
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -25,3 +26,4 @@ const config: Phaser.Types.Core.GameConfig = {
 new Phaser.Game(config);
 
 // 23 videos is watched
+// 3 videos is watched in working day
