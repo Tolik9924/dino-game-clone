@@ -20,6 +20,7 @@ class PlayScene extends GameScene {
     clouds: Phaser.GameObjects.Group;
     startTrigger: SpriteWithDynamicBody;
 
+    highScoreText: Phaser.GameObjects.Text;
     scoreText: Phaser.GameObjects.Text;
     gameOverContainer: Phaser.GameObjects.Container;
     gameOverText: Phaser.GameObjects.Image;
@@ -32,6 +33,7 @@ class PlayScene extends GameScene {
     spawnInterval: number = 1500;
     spawnTime: number = 0;
     gameSpeed: number = 10;
+    gameSpeedModifier: number = 1;
 
     constructor() {
         super("PlayScene");
@@ -58,8 +60,19 @@ class PlayScene extends GameScene {
 
         if (this.scoreDeltaTime >= this.scoreInterval) {
             this.score++;
-            console.log(this.score);
             this.scoreDeltaTime = 0;
+
+            if (this.score % 100 === 0) {
+                this.gameSpeedModifier += 0.2;
+
+                this.tweens.add({
+                    targets: this.scoreText,
+                    duration: 100,
+                    repeat: 3,
+                    alpha: 0,
+                    yoyo: true,
+                });
+            }
         }
 
         if (this.spawnTime >= this.spawnInterval) {
@@ -67,8 +80,16 @@ class PlayScene extends GameScene {
             this.spawnTime = 0;
         }
 
-        Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed);
+        Phaser.Actions.IncX(this.obstacles.getChildren(), -this.gameSpeed * this.gameSpeedModifier);
         Phaser.Actions.IncX(this.clouds.getChildren(), -0.5);
+
+        const score = Array.from(String(this.score), Number);
+
+        for (let i = 0; i < 5 - String(this.score).length; i++) {
+            score.unshift(0);
+        }
+
+        this.scoreText.setText(score.join(""));
 
         this.obstacles.getChildren().forEach((obstacle: SpriteWithDynamicBody) => {
             if (obstacle.getBounds().right < 0) {
@@ -82,7 +103,7 @@ class PlayScene extends GameScene {
             }
         });
 
-        this.ground.tilePositionX += this.gameSpeed;
+        this.ground.tilePositionX += (this.gameSpeed * this.gameSpeedModifier);
     }
 
     createEnvironment() {
@@ -129,6 +150,13 @@ class PlayScene extends GameScene {
 
     createScore() {
         this.scoreText = this.add.text(this.gameWidth, 0, "00000", {
+            fontSize: 30,
+            fontFamily: "Arial",
+            color: "#535353",
+            resolution: 5
+        }).setOrigin(1, 0).setAlpha(0);
+
+        this.highScoreText = this.add.text(this.scoreText.getBounds().left - 20, 0, "00000", {
             fontSize: 30,
             fontFamily: "Arial",
             color: "#535353",
@@ -203,10 +231,17 @@ class PlayScene extends GameScene {
             this.player.die();
             this.gameOverContainer.setAlpha(1);
 
+            const newHighScore = this.highScoreText.text.substring(this.highScoreText.text.length - 5);
+            const newScore = Number(this.scoreText.text) > Number(newHighScore) ? 
+                this.scoreText.text : newHighScore;
+
+            this.highScoreText.setText("Hi " + newScore);
+            this.highScoreText.setAlpha(1);
+
             this.spawnTime = 0;
             this.score = 0;
             this.scoreDeltaTime = 0;
-            this.gameSpeed = 5;
+            this.gameSpeedModifier = 1;
         });
     }
 
@@ -218,7 +253,6 @@ class PlayScene extends GameScene {
             this.obstacles.clear(true, true);
             this.gameOverContainer.setAlpha(0);
             this.anims.resumeAll();
-            this.gameSpeed = 10;
 
             this.isGameRunning = true;
         });

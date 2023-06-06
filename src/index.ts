@@ -26,4 +26,4 @@ const config: Phaser.Types.Core.GameConfig = {
 new Phaser.Game(config);
 
 // 23 videos is watched
-// 3 videos is watched in working day
+// 4 videos is watched in working day
