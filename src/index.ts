@@ -17,13 +17,10 @@ const config: Phaser.Types.Core.GameConfig = {
   physics: {
     default: 'arcade',
     arcade: {
-        debug: true,
+        debug: false,
     }
   },
   scene: [PreloadScene, PlayScene]
 };
 
 new Phaser.Game(config);
-
-// 23 videos is watched
-// 4 videos is watched in working day
